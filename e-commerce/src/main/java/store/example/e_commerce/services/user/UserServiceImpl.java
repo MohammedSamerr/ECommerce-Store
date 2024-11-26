@@ -1,5 +1,6 @@
 package store.example.e_commerce.services.user;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,19 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @PostConstruct
+    public void createAdminAccount(){
+        User AdminAcc = userRepo.findByUserRole(UserRole.ADMIN);
+        if(AdminAcc == null){
+            User user = new User();
+            user.setUserRole(UserRole.ADMIN);
+            user.setEmail("Admin@Admin.com");
+            user.setName("ADMIN");
+            user.setPassword(new BCryptPasswordEncoder().encode("admin"));
+            userRepo.save(user);
+        }
+    }
 
     @Override
     public UserDto createUser(SignUpDto signUpDto) {
